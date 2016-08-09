@@ -2,9 +2,12 @@ package com.synchro.pouch.service.couch;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
+import com.synchro.pouch.business.sync.DocumentChange;
+import com.synchro.pouch.business.sync.SyncChanges;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpStatus;
@@ -144,5 +147,53 @@ public class CouchBaseServiceImpl implements CouchBaseService {
             }
         }
         return null;
+    }
+
+    @Override
+    public SyncChanges getChanges(String bucketName, String sinceRevision, String channel) {
+        CloseableHttpClient client = HttpClients.createDefault();
+        URIBuilder builder = new URIBuilder();
+        builder.setScheme(syncGatewayUrlSheme)
+                .setHost(syncGatewayUrlHost)
+                .setPort(syncGatewayUrlPort)
+                .setPath(URL_SEPARATOR + bucketName + URL_SEPARATOR + "_changes")
+                .setParameter("filter", "sync_gateway/bychannel")
+                .setParameter("channels", channel)
+                .setParameter("since", sinceRevision);
+
+        CloseableHttpResponse response = null;
+        try {
+            HttpGet get = new HttpGet(builder.build());
+            response = client.execute(get);
+            InputStream is = response.getEntity().getContent();
+
+            JsonObject object = new JsonParser().parse(new InputStreamReader(is)).getAsJsonObject();
+            SyncChanges syncChanges = new SyncChanges(object.getAsJsonPrimitive("last_seq").getAsString());
+
+            JsonArray results = object.getAsJsonArray("results");
+            for (JsonElement result : results) {
+                JsonObject nextResult = result.getAsJsonObject();
+                DocumentChange docChange = new DocumentChange();
+                docChange.setId(nextResult.getAsJsonPrimitive("id").getAsString());
+                docChange.setSeq(nextResult.getAsJsonPrimitive("seq").getAsString());
+                // We use last change on document to have current revision
+                JsonObject currentDocumentChanges = nextResult.getAsJsonArray("changes").get(0).getAsJsonObject();
+                docChange.setRevision(currentDocumentChanges.getAsJsonPrimitive("rev").getAsString());
+                syncChanges.getDocumentChanges().add(docChange);
+            }
+
+            return syncChanges;
+        } catch (URISyntaxException | IOException e) {
+            LOGGER.info("Error while retrieving changes.");
+            throw new RuntimeException(e);
+        } finally {
+            if (response != null) {
+                try {
+                    response.close();
+                } catch (IOException e) {
+                    LOGGER.info("Error while closing insertion response.");
+                }
+            }
+        }
     }
 }
