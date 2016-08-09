@@ -1,8 +1,8 @@
 package com.synchro.pouch.service;
 
+import com.google.common.collect.Lists;
 import com.synchro.pouch.business.Animal;
 import com.synchro.pouch.repository.AnimalDao;
-import com.google.common.collect.Lists;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
