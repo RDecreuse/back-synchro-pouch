@@ -20,6 +20,8 @@ public class Animal {
     @Column(name = "animal_id")
     private Long id;
 
+    private String documentId;
+
     private String name;
 
     private Integer age;
