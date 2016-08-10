@@ -1,0 +1,37 @@
+Installation de CouchBase
+
+- Installer CouchBase (http://www.couchbase.com/nosql-databases/downloads)
+- Configuration CouchBase => http://localhost:8091/index.html
+puis création de deux buckets : r_animal et w_animal
+
+
+Installation de la sync gateway
+- Installer Sync-gateway (même page que CouchBase, partie mobile)
+- Coller le fichier de configuration fourni : /opt/couchbase-sync-gateway/bin/conf.json
+- Lancer la commande (utiliser sudo en dev, et faire des droits corrects pour la prod) :
+/opt/couchbase-sync-gateway/bin/sync_gateway -logFilePath=/var/log/sg_error.log /opt/couchbase-sync-gateway/bin/conf.json &
+=> Vérifier que le process est bien en cours et qu'on a bien 3 documents en plus dans les buckets
+
+Installation du front angular2
+- cloner le repo https://github.com/RDecreuse/angular2-synchro-pouch
+- suivre le tuto d'installation de la seed que j'ai utilisée : https://github.com/mgechev/angular2-seed  (tldr => npm install puis npm start)
+
+Installation du back
+- aller dans le dossier {BACK_WORKSPACE}/database/distribution
+- Lancer la création de l'image docker qui contient les tables et un dataset de départ : ./test-make.sh
+- Lancer l'image : ./test-run.sh
+- Lancer le main de la classe com.synchro.pouch.SynchroPouchApplication
+
+Installation de postman
+- Installer le software
+- Importer la collection {BACK_WORKSPACE}/src/main/resources/sync.postman_collection.json
+- Lancer l'appel "all docs with channel" pour tester la sync gateway/couchBase
+- Lancer l'appel "get animal from database" pour tester le backend et la base postgresql
+
+Tester la synchronisation descendante :
+- Se rendre sur la page http://localhost:5555/about pour voir les animaux dans la sync-gateway
+- Lancer la commande "synchronize sync gateway" et constater les changements sur la page (apparition de lignes)
+
+Tester la synchronisation montante :
+- Ajouter des documents dans la sync-gateway (via l'appel à "add animal" dans POSTMAN ou plus tard dans l'appli web)
+- Lancer l'appel "persist in database" et constater que les tables animal et sync_params ont bien été mises à jour.

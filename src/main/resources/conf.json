@@ -1,0 +1,23 @@
+{
+  "log": ["*"],
+  "adminInterface": "0.0.0.0:4985",
+  "interface": "0.0.0.0:4984",
+  "CORS": {
+    "Origin": ["http://localhost:3333"],
+    "LoginOrigin": ["http://localhost:3333"],
+    "Headers": ["Content-Type", "Cookie"],
+    "MaxAge": 1728000
+  },
+  "databases": {
+    "r_animal": {
+      "server": "http://127.0.0.1:8091",
+      "bucket": "r_animal",
+      "users": { "GUEST": { "disabled": false, "admin_channels": ["*"] } }
+    },
+    "w_animal": {
+      "server": "http://127.0.0.1:8091",
+      "bucket": "w_animal",
+      "users": { "GUEST": { "disabled": false, "admin_channels": ["*"] } }
+    }
+	}
+}
