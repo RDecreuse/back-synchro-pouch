@@ -47,6 +47,6 @@ public class SyncGatewayResource {
 
     @RequestMapping(method = RequestMethod.GET, path = "/synchronize")
     public void synchronizeSyncGateway() {
-        this.synchronizationService.synchronizeSyncGateway();
+        this.synchronizationService.synchronizeSyncGateway(animalBucket);
     }
 }

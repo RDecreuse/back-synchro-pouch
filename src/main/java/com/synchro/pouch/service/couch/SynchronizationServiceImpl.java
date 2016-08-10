@@ -1,5 +1,6 @@
 package com.synchro.pouch.service.couch;
 
+import com.google.common.collect.Lists;
 import com.synchro.pouch.business.Animal;
 import com.synchro.pouch.business.dto.AnimalSync;
 import com.synchro.pouch.business.sync.DocumentChange;
@@ -34,8 +35,18 @@ public class SynchronizationServiceImpl implements SynchronizationService {
     private SyncParamsDao syncParamsDao;
 
     @Override
-    public void synchronizeSyncGateway() {
-        //WIP
+    public void synchronizeSyncGateway(String bucketName) {
+
+        // Maybe we should not update all documents, use an update date to synchronize only the documents which need it !
+        List<Animal> animals = animalService.getAnimals();
+        LOGGER.info("Insert {} animals from database", animals.size());
+
+        for (Animal animal : animals) {
+            AnimalSync animalSync = new AnimalSync(animal);
+            animalSync.setChannels(Lists.newArrayList(animalChannel));
+            couchBaseService.insertOrUpdate(animalSync, animalSync.getDocumentId(), bucketName);
+        }
+        LOGGER.info("{} animals inserted/updated", animals.size());
     }
 
     @Override
