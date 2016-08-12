@@ -10,7 +10,7 @@ public interface AnimalService {
 
     Animal findOne(Long animalId);
 
-    Animal create(Animal animal);
+    Animal createOrUpdate(Animal animal);
 
     Animal update(Animal animal);
 

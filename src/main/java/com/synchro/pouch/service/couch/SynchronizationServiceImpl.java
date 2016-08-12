@@ -67,7 +67,7 @@ public class SynchronizationServiceImpl implements SynchronizationService {
         for (DocumentChange documentChange : documentChanges) {
             AnimalSync newAnimalSync = couchBaseService.findDocumentAs(documentChange.getId(), bucketName, AnimalSync.class);
             Animal newAnimal = newAnimalSync.toAnimal();
-            animalService.create(newAnimal);
+            animalService.createOrUpdate(newAnimal);
             LOGGER.info("New animal created with id={}", newAnimal.getId());
         }
 

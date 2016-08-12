@@ -26,7 +26,7 @@ public class AnimalServiceImpl implements AnimalService {
     }
 
     @Override
-    public Animal create(Animal animal) {
+    public Animal createOrUpdate(Animal animal) {
         return dao.save(animal);
     }
 

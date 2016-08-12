@@ -29,7 +29,7 @@ public class AnimalResource {
 
     @RequestMapping(method = RequestMethod.POST)
     public ResponseEntity<Animal> create(@RequestBody Animal animal) {
-        return ResponseEntity.status(HttpStatus.CREATED).body(service.create(animal));
+        return ResponseEntity.status(HttpStatus.CREATED).body(service.createOrUpdate(animal));
     }
 
     @RequestMapping(path = "/{animalId}", method = RequestMethod.PUT)
